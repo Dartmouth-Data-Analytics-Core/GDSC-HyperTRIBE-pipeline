@@ -29,10 +29,10 @@ sample_list = list(samples_df["Sample_ID"])
 rule all:
     input:
         #----- Rule trim outputs
-        expand("trimming/{sample}_R1.paired.trim.fastq.gz", sample=sample_list),
-        expand("trimming/{sample}_R2.paired.trim.fastq.gz", sample=sample_list),
-        expand("trimming/{sample}_R1.unpaired.trim.fastq.gz", sample=sample_list),
-        expand("trimming/{sample}_R2.unpaired.trim.fastq.gz", sample=sample_list),
+        expand("trimming/{sample}_R1.paired.trim.fastq.gz"), 
+        expand("trimming/{sample}_R2.paired.trim.fastq.gz", sample=sample_list) if config["layout"] == "paired" else [],
+        expand("trimming/{sample}_R1.unpaired.trim.fastq.gz", sample=sample_list) if config["layout"] == "paired" else [],
+        expand("trimming/{sample}_R2.unpaired.trim.fastq.gz", sample=sample_list) if config["layout"] == "paired" else [],
        
         #----- Rule align outputs
         expand("alignment/{sample}.sam", sample=sample_list),
@@ -66,30 +66,40 @@ rule all:
 rule trim:
     output:
         trimR1 = "trimming/{sample}_R1.paired.trim.fastq.gz",
-        trimR2 = "trimming/{sample}_R2.paired.trim.fastq.gz",
-        unpairedR1 = "trimming/{sample}_R1.unpaired.trim.fastq.gz",
-        unpairedR2 = "trimming/{sample}_R2.unpaired.trim.fastq.gz"
+        trimR2 = "trimming/{sample}_R2.paired.trim.fastq.gz" if config["layout"]=="paired" else [],
+        unpairedR1 = "trimming/{sample}_R1.unpaired.trim.fastq.gz" if config["layout"]=="paired" else [],
+        unpairedR2 = "trimming/{sample}_R2.unpaired.trim.fastq.gz" if config["layout"]=="paired" else []
     conda: "align"
     resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
     params:
         sample = lambda wildcards: wildcards.sample,
+        layout = config["layout"],
         fastq1 = lambda wildcards: samples_df.loc[wildcards.sample, "fastq_1"],
-        fastq2 = lambda wildcards: samples_df.loc[wildcards.sample, "fastq_2"],
+        fastq2 = lambda wildcards: samples_df.loc[wildcards.sample, "fastq_2"] if config["layout"]=="paired" else [],
         avgquality = config["avgquality"]
     shell: """
         
-        trimmomatic PE -phred33 \
-            {params.fastq1} {params.fastq2} \
-            {output.trimR1} {output.unpairedR1} \
-            {output.trimR2} {output.unpairedR2} \
-            HEADCROP:6 \
-            LEADING:25 \
-            TRAILING:25 \
-            AVGQUAL:{params.avgquality} \
-            MINLEN:19
-		
-        
-        
+        if [ "{params.layout}" == "paired" ]
+        then
+            trimmomatic PE -phred33 \
+                {params.fastq1} {params.fastq2} \
+                {output.trimR1} {output.unpairedR1} \
+                {output.trimR2} {output.unpairedR2} \
+                HEADCROP:6 \
+                LEADING:25 \
+                TRAILING:25 \
+                AVGQUAL:{params.avgquality} \
+                MINLEN:19
+        else
+            trimmomatic SE -phred33 \
+                {params.fastq1} \
+                {output.trimR1} \
+                HEADCROP:6 \
+                LEADING:25 \
+                TRAILING:25 \
+                AVGQUAL:{params.avgquality} \
+                MINLEN:19
+        fi     
     """
 
 rule align:
