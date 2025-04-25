@@ -214,10 +214,10 @@ rule sam2matrix:
             {params.replicate}
        
        #----- Move perl output to new file name
-       mv {params.sample}.nodup.sort.sam.matrix.wig {output.matrixFile}
+       mv noDups/{params.sample}.nodup.sort.sam.matrix.wig {output.matrixFile}
 
        #----- Create SQL database
-       perl {params.loadMatrix} -t {params.sample} -d {output.matrixFile}
+       #perl {params.loadMatrix} -t {params.sample} -d {output.matrixFile}
     """
 
 

@@ -9,6 +9,7 @@
 # replicate must be an integer
 sample_csv: "sample_fastq_list_single.txt"
 experimentName: "test"
+layout: "paired"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # (NO CONDA) SOFTWARE PATHS
