@@ -21,24 +21,47 @@ The major steps of this pipeline are as follows:
 3. Find RNA edit sites wtRNA-RNA approaches
 
 ## Prerequisites
-This pipeline relies on a series of conda environments and a MySQL Instance through [Dartmouth Dashboard](https://dashboard.dartmouth.edu/login?ticket=ST-53352-NHRbCfD1GUAsNsEkc4n9NgHRZYs-localhost). Should this instance fail, a new instance can be created following [these instructions] (https://services.dartmouth.edu/TDClient/1806/Portal/KB/ArticleDet?ID=150826). Once an instance is generated, credentials can be obtained in the CLI section on Dartmouth Dashboard. 
+This pipeline relies on a series of conda environments and a MySQL Instance through [Dartmouth Dashboard](https://dashboard.dartmouth.edu/login?ticket=ST-53352-NHRbCfD1GUAsNsEkc4n9NgHRZYs-localhost). Should this instance fail, a new instance can be created following [these instructions](https://services.dartmouth.edu/TDClient/1806/Portal/KB/ArticleDet?ID=150826). Once an instance is generated, credentials can be obtained in the CLI section on Dartmouth Dashboard. 
 
 **Anytime a new instance is generated, the MySQL credentials will need to be edited in the perl source code files in the `CODE` directory**
 
 The current credentials for the MySQL instance are as follows:
 
-|Host|Database|User|Password|
-|----|--------|----|--------|
-|dmseq-f11b-db.c.dartmouth.edu|dmseq|admin|gdscPass|
+|Host|Database|User|Password|Last Updated|
+|----|--------|----|--------|------------|
+|dmseq-f11b-db.c.dartmouth.edu|dmseq|admin|gdscPass|April 26th, 2025|
 
 ## Implementation
+
+1. Clone the github repository
+
+```shell
+git clone https://github.com/Dartmouth-Data-Analytics-Core/GDSC-HyperTRIBE
+cd GDSC-HyperTRIBE
+```
+
+2. Ensure all variables in `config.yaml` are edited to point to proper paths
+
+3. Submit Snakemake job script
+
+```shell
+sbatch job.script.sh
+```
 
 ## Software
 |Tool|Version|Conda|
 |----|-------|-----|
-|Trimmomatic|0.39|align|
-|bowtie2|2.5.4|align|
-|
+|Trimmomatic|0.39|`align`|
+|bowtie2|2.5.4|`align`|
+|star|2.7.11b|`align`|
+|picard|3.4.0|`rnaseq1` or `align`|
+|samtools|1.15.1|`samtools`|
+|perl|5.32.1|`perl`|
+|perl-app-cpanminus|1.7048|`perl`|
+|perl-dbi|1.643|`perl`|
+|perl-dbd-mysql|4.050|`perl`|
+|mysql|9.3.0|`perl`|
+|bedtools|TBD|TBD|
 
 ## References
 For more details please see:
