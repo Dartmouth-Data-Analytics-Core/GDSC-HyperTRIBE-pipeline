@@ -21,7 +21,6 @@ samples_df = pd.read_table(config["sample_csv"], delimiter=",").set_index("Sampl
 sample_list = list(samples_df["Sample_ID"])
 
 
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # SNAKEMAKE RULES
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -58,6 +57,9 @@ rule all:
 
         #----- Rule diagnose_SQL outputs
         expand("mySQL_logs/{sample}.diagnostic.txt", sample=sample_list),
+
+        #----- Rule Fine_RNA_edit_sites outputs
+        expand("RNA_Edits/{sample}.a2g.txt", sample=sample_list),
 
     output: "multiqc_report.html"
     conda: "rnaseq1"
@@ -224,7 +226,6 @@ rule sam2matrix:
         perl {params.samToMatrix} \
             {input.samSorted} \
             {params.sample} \
-            {params.expName} \
             {params.replicate}
        
         #----- Move perl output to new file name
@@ -267,9 +268,53 @@ rule diagnose_SQL:
         #----- Diagnose that table is loaded correctly
         touch "{output.diagnostic}"
         echo "Diagnosing {params.sample} database..." >> {output.diagnostic}
-        perl {params.diagnoseDatabase} -t {params.sample} "matrix/{params.sample}.matrix"
+        perl {params.diagnoseDatabase} -t {params.sample} "matrix/{params.sample}.matrix" && \
+        echo "Data table exists!" >> {output.diagnostic}
+
 
     """
+
+#----- Rule to identify RNAedit sites
+# Eventually, will need to add support for replicates...
+rule find_RNA_edit_sites:
+    input:
+        diagnostic = "mySQL_logs/{sample}.diagnostic.txt",
+        sqlLog = "mySQL_logs/{sample}.connected.txt",
+        matrixFile = "matrix/{sample}.matrix"
+    output:
+        a2g = "RNA_Edits/{sample}.a2g.txt"
+    conda: "perl"
+    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
+    params:
+        sample = lambda wildcards: wildcards.sample,
+        findRNA = config["findRNA"],
+        annotations = config["annotationFile"],
+        refSample = config["refSample"],
+        timepoint = config["timepoint"],
+        wtTimepoint = config["wtTimepoint"],
+        expName = config["experimentName"]
+
+    shell: """
+
+        #----- Check that the current sample is not the reference sample
+        if [ {params.sample} == {params.refSample} ]
+        then 
+            echo "Skipping reference sample {params.sample}"
+            touch RNA_Edits/{params.refSample}.a2g.txt
+        else
+            #----- Run perl script to find RNA edit sites
+            perl {params.findRNA} \
+                -a {params.annotations} \
+                -t {params.sample} \
+                -e {params.sample} \
+                -c {params.timepoint} \
+                -o {output.a2g} \
+                -g {params.refSample} \
+                -j {params.refSample} \
+                -k {params.wtTimepoint}
+        fi 
+    """
+
 
 
 

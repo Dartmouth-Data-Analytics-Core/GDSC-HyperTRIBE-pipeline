@@ -10,6 +10,7 @@
 sample_csv: "sample_fastq_list_single.txt"
 experimentName: "test"
 layout: "paired"
+refSample: "DCD"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # (NO CONDA) SOFTWARE PATHS
@@ -24,8 +25,20 @@ avgquality: "25"
 starIndex: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/misc/shared-software/workflows/hypertribe/HyperTRIBE/annotations/star_indices"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# RNA-EDIT SITE PARAMETERS
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+annotationFile: "annotations/refFlat.txt"
+wtRNA_tableName: "DCD"
+wtRNA_timepoint: "1"
+rna_tableName: ""
+RNA_experiment: "Test"
+timepoint: "2"
+wtTimepoint: "1"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # UTILITY SCRIPTS
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 samToMatrixScript: "CODE/sam_to_matrix.pl"
 loadMatrix: "CODE/load_matrix_data.pl"
 diagnoseDatabase: "CODE/diagnose_mysql_table.pl"
+findRNA: "CODE/find_rnaeditsites.pl"
