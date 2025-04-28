@@ -63,6 +63,11 @@ rule all:
 
         #----- Rule edits2bedgraph outputs
         expand("bedgraphs/{sample}.bedgraph", sample=sample_list),
+        expand("bedgraphs/{sample}.log", sample=sample_list),
+
+        #----- Rule threshold outputs
+        expand("filtered/{sample}.high.threshold.bedgraph", sample=sample_list),
+        expand("filtered/{sample}.low.threshold.bedgraph", sample=sample_list)
 
     output: "multiqc_report.html"
     conda: "rnaseq1"
@@ -330,7 +335,8 @@ rule edits2bedgraph:
     input:
         a2g = "RNA_Edits/{sample}.a2g.txt"
     output:
-        bedgraph = "bedgraphs/{sample}.bedgraph"
+        bedgraph = "bedgraphs/{sample}.bedgraph",
+        logFile = "bedgraphs/{sample}.log"
     conda: "rnaseq1"
     resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
     params:
@@ -343,7 +349,47 @@ rule edits2bedgraph:
 
         #----- Move python output to new file name
         mv RNA_Edits/{params.sample}.a2g.txt.bedgraph {output.bedgraph}
+
+        #----- Make dummy file with touch
+        touch {output.logFile}
+        echo "Done!" >> {output.logFile}
     
+    """
+
+#----- Rule to apply thresholds
+rule threshold:
+    input:
+        bedgraph = "bedgraphs/{sample}.bedgraph",
+        logFile = "bedgraphs/{sample}.log"
+    output:
+        filteredHigh = "filtered/{sample}.high.threshold.bedgraph",
+        filteredLow = "filtered/{sample}.low.threshold.bedgraph"
+    conda: "perl"
+    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
+    params:
+        sample = lambda wildcards: wildcards.sample,
+        refSample = config["refSample"],
+        filterScript = config["filterScript"],
+        fivePercentEditThreshold = config["fivePercentEditThreshold"],
+        onePercentEditThreshold = config["onePercentEditThreshold"],
+        readThreshold = config["readThreshold"],
+    shell: """
+    
+        #----- Run the perl script to filter with high threshold
+        perl {params.filterScript} \
+            3 \
+            {params.fivePercentEditThreshold} \
+            20 \
+            {params.readThreshold} \
+            {input.bedgraph} > {output.filteredHigh}
+
+        #----- Run the perl script to filter with low threshold
+        perl {params.filterScript} \
+            3 \
+            {params.onePercentEditThreshold} \
+            20 \
+            {params.readThreshold} \
+            {input.bedgraph} > {output.filteredLow}
     """
 
 
