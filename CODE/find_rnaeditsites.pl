@@ -21,16 +21,18 @@ getopts( 'a:t:e:g:c:o:j:k:h', \%option );
 my ($annotationfile, $tablename, $exp, $gDNAtablename, $OUTFILE, $tp, $gexp, $gDNAtp);
 
 #MYSQL CONFIG VARIABLES
-my $host = "hypertribe-d174-db.c.dartmouth.edu";
+my $host = "dmseq-f11b-db.c.dartmouth.edu";
 my $database = "dmseq";
-my $user = "gdsc"; #mysql username
-my $password = "gdsc1227"; #mysql password, if any
-#my $password = "password"; #mysql password, if any
+my $user = "admin"; #mysql username
+my $password = "gdscPass";
 
 #connect to the mysql database
-my $dsn = "DBI:mysql:$database:$host"; 
-my $dbh = DBI->connect( $dsn, $user, $password, {RaiseError=>1, PrintError=>0} ) or die $DBI::errstr;
-
+my $dsn = "DBI:mysql:$database:$host:3306;mysql_local_infile=1";
+my $dbh = DBI->connect($dsn, $user, $password, { 
+    RaiseError => 1, 
+    mysql_read_default_file => '/CODE/mysql.cnf',
+    mysql_ssl => 1,  
+}) or die $DBI::errstr;
 my ($sth);
 #-----------------
 #MYSQL TABLE VARIABLES
