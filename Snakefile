@@ -218,7 +218,6 @@ rule sam2matrix:
     resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
     params:
         sample = lambda wildcards: wildcards.sample,
-        expName = config["experimentName"],
         replicate = lambda wildcards: samples_df.loc[wildcards.sample, "replicate"],
         samToMatrix = config["samToMatrixScript"],
     shell: """
@@ -292,9 +291,17 @@ rule find_RNA_edit_sites:
         refSample = config["refSample"],
         timepoint = config["timepoint"],
         wtTimepoint = config["wtTimepoint"],
-        expName = config["experimentName"]
-
     shell: """
+
+        #-----HELP MENU
+        # -a = annotation file
+        # -t = RNA table name
+        # -e = RNA experiment name (sample name)
+        # -c = RNA timepoint (from sample sheet)
+        # -o = output file name
+        # -g = reference RNA sample
+        # -j = reference RNA table name
+        # -k = reference RNA timepoint (from sample sheet)
 
         #----- Check that the current sample is not the reference sample
         if [ {params.sample} == {params.refSample} ]

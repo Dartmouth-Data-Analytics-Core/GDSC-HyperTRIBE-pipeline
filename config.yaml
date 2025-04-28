@@ -29,9 +29,6 @@ starIndex: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/misc/shared-software/workflows/hy
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 annotationFile: "annotations/refFlat.txt"
 wtRNA_tableName: "DCD"
-wtRNA_timepoint: "1"
-rna_tableName: ""
-RNA_experiment: "Test"
 timepoint: "2"
 wtTimepoint: "1"
 
