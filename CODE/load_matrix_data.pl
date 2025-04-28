@@ -11,7 +11,7 @@ my $USAGE = "load_matrix_data.pl -t tablename -d datafile\n";
 my %option;
 getopts( 't:d:h', \%option );
 my ($tablename, $matrixfile);
-if ( $option{t} &&  $option{d} ) {
+if ( $option{t} &&  $option{d}) {
     $tablename = $option{t};
     $matrixfile = $option{d};
 } else {
@@ -19,15 +19,35 @@ if ( $option{t} &&  $option{d} ) {
 }
 
 #MYSQL CONFIG VARIABLES
-my $host = "hypertribe-d174-db.c.dartmouth.edu";
-my $database = "dmseq";
-my $user = "gdsc"; #mysql username
-my $password = "gdsc1227"; #mysql password, if any
+#my $host = "hypertribe-d174-db.c.dartmouth.edu";
+#my $database = "dmseq";
+#my $user = "gdsc"; #mysql username
+#my $password = "gdsc1227"; #mysql password, if any
 #my $password = "password"; #mysql password, if any
 
+my $host = "dmseq-f11b-db.c.dartmouth.edu";
+my $database = "dmseq";
+my $user = "admin"; #mysql username
+my $password = "gdscPass";
+
 # connect to the mysql database
-my $dsn = "DBI:mysql:$database:$host"; 
-my $dbh = DBI->connect( $dsn, $user, $password, {RaiseError=>1, PrintError=>0} ) or die $DBI::errstr; 
+#my $dsn = "DBI:mysql:$database:$host"; 
+#my $dbh = DBI->connect( $dsn, $user, $password, {RaiseError=>1, PrintError=>0} ) or die $DBI::errstr; 
+
+my $dsn = "DBI:mysql:$database:$host:3306;mysql_local_infile=1";
+#my $dbh = DBI->connect($dsn, $user, $password, { RaiseError => 1 }) or die $DBI::errstr;
+
+my $dbh = DBI->connect($dsn, $user, $password, { 
+    RaiseError => 1, 
+    mysql_read_default_file => '/CODE/mysql.cnf',
+    mysql_ssl => 1,  
+}) or die $DBI::errstr;
+
+
+# Drop the table if it already exists
+#eval {
+#    $dbh->do("DROP TABLE IF EXISTS $tablename");
+#};
 
 my ($sth);
 #create the table
@@ -44,6 +64,9 @@ if ($@) {
 	print "Error in database creation: $@";
     }
 }
+
+
+
 
 #load the table
 eval {

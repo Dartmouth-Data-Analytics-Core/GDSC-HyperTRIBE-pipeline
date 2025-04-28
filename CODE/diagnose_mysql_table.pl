@@ -14,21 +14,27 @@ getopts( 't:h', \%option );
 my ($tablename);
 if ( $option{t}) {
     $tablename = $option{t};
+   
 } else {
     die "proper parameters not passed\n$USAGE";
 }
 
 #MYSQL CONFIG VARIABLES
 #my $host = "172.16.1.40"; # if mysql is hosted in a different machine
-my $host = "hypertribe-d174-db.c.dartmouth.edu";
+my $host = "dmseq-f11b-db.c.dartmouth.edu";
 my $database = "dmseq";
-my $user = "gdsc"; #mysql username
-#my $password = ""; #mysql password, if any
-my $password = "gdsc1227"; #mysql password, if any
+my $user = "admin"; #mysql username
+my $password = "gdscPass";
 
 # connect to the mysql database
-my $dsn = "DBI:mysql:$database:$host"; 
-my $dbh = DBI->connect( $dsn, $user, $password, {RaiseError=>1, PrintError=>0} ) or die $DBI::errstr; 
+my $dsn = "DBI:mysql:$database:$host:3306;mysql_local_infile=1";
+#my $dbh = DBI->connect($dsn, $user, $password, { RaiseError => 1 }) or die $DBI::errstr;
+
+my $dbh = DBI->connect($dsn, $user, $password, { 
+    RaiseError => 1, 
+    mysql_read_default_file => '/CODE/mysql.cnf',
+    mysql_ssl => 1,  
+}) or die $DBI::errstr;
 
 my ($sth);
 #create the table

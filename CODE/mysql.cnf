@@ -1,0 +1,3 @@
+[client]
+local_infile = 1
+ssl-mode=REQUIRED

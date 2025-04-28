@@ -29,7 +29,7 @@ sample_list = list(samples_df["Sample_ID"])
 rule all:
     input:
         #----- Rule trim outputs
-        expand("trimming/{sample}_R1.paired.trim.fastq.gz"), 
+        expand("trimming/{sample}_R1.paired.trim.fastq.gz", sample=sample_list), 
         expand("trimming/{sample}_R2.paired.trim.fastq.gz", sample=sample_list) if config["layout"] == "paired" else [],
         expand("trimming/{sample}_R1.unpaired.trim.fastq.gz", sample=sample_list) if config["layout"] == "paired" else [],
         expand("trimming/{sample}_R2.unpaired.trim.fastq.gz", sample=sample_list) if config["layout"] == "paired" else [],
@@ -53,13 +53,19 @@ rule all:
         #----- Rule sam2matrix outputs
         expand("matrix/{sample}.matrix", sample=sample_list),
 
+        #----- Rule build_SQL outputs
+        expand("mySQL_logs/{sample}.connected.txt", sample=sample_list),
+
+        #----- Rule diagnose_SQL outputs
+        expand("mySQL_logs/{sample}.diagnostic.txt", sample=sample_list),
+
     output: "multiqc_report.html"
     conda: "rnaseq1"
     resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
     shell: """
         
         #----- Run MultiQC
-        multiqc trimming nodup
+        multiqc trimming noDups
     """
 
 #----- Rule to execute trimming
@@ -200,21 +206,19 @@ rule sort_sam:
     
     """
 
-#----- Rule to generate mySql Table (might need to add script argument to sample file)
+#----- Rule to generate matrix needed to build SQL table
 rule sam2matrix:
     input:
         samSorted = "noDups/{sample}.nodup.sort.sam"
     output:
-        matrixFile = "matrix/{sample}.matrix"
+        matrixFile = "matrix/{sample}.matrix",
     conda: "perl"
     resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
     params:
         sample = lambda wildcards: wildcards.sample,
         expName = config["experimentName"],
         replicate = lambda wildcards: samples_df.loc[wildcards.sample, "replicate"],
-        loadTable = config["loadTableScript"],
         samToMatrix = config["samToMatrixScript"],
-        loadMatrix = config["loadMatrix"]
     shell: """
         #----- Run the sam_to_matrix.pl script
         perl {params.samToMatrix} \
@@ -223,12 +227,53 @@ rule sam2matrix:
             {params.expName} \
             {params.replicate}
        
-       #----- Move perl output to new file name
-       mv noDups/{params.sample}.nodup.sort.sam.matrix.wig {output.matrixFile}
-
-       #----- Create SQL database
-       #perl {params.loadMatrix} -t {params.sample} -d {output.matrixFile}
+        #----- Move perl output to new file name
+        mv noDups/{params.sample}.nodup.sort.sam.matrix.wig {output.matrixFile}
     """
+
+#----- Rule to build SQL table 
+rule build_SQL:
+    input:
+        matrixFile = "matrix/{sample}.matrix"
+    output:
+        sqlLog = "mySQL_logs/{sample}.connected.txt"
+    conda: "perl"
+    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
+    params:
+        sample = lambda wildcards: wildcards.sample,
+        loadMatrix = config["loadMatrix"],
+    shell: """
+        
+        #----- Load matrix
+        touch "{output.sqlLog}"
+        echo "Starting connection for table {params.sample} in dmseq database..." >> {output.sqlLog}
+        perl {params.loadMatrix} -t {params.sample} -d {input.matrixFile}  && \
+        echo "Connection successful!" >> {output.sqlLog}
+    """
+
+#----- Rule to check table entry is same size as matrix
+rule diagnose_SQL:
+    input:
+        sqlLog = "mySQL_logs/{sample}.connected.txt"
+    output:
+        diagnostic = "mySQL_logs/{sample}.diagnostic.txt"
+    conda: "perl"
+    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
+    params:
+        sample = lambda wildcards: wildcards.sample,
+        diagnoseDatabase = config["diagnoseDatabase"]
+    shell: """
+        
+        #----- Diagnose that table is loaded correctly
+        touch "{output.diagnostic}"
+        echo "Diagnosing {params.sample} database..." >> {output.diagnostic}
+        perl {params.diagnoseDatabase} -t {params.sample} "matrix/{params.sample}.matrix"
+
+    """
+
+
+
+    
 
 
 
