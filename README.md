@@ -31,7 +31,14 @@ The current credentials for the MySQL instance are as follows:
 |----|--------|----|--------|------------|
 |dmseq-f11b-db.c.dartmouth.edu|dmseq|admin|gdscPass|April 26th, 2025|
 
+
+
 ## Implementation
+
+To interactively use the MySQL instance, run the following command:
+```{shell}
+mysql -h dmseq-f11b-db.c.dartmouth.edu -u admin -p --ssl-mode=REQUIRED
+```
 
 1. Clone the github repository
 
