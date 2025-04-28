@@ -61,6 +61,9 @@ rule all:
         #----- Rule Fine_RNA_edit_sites outputs
         expand("RNA_Edits/{sample}.a2g.txt", sample=sample_list),
 
+        #----- Rule edits2bedgraph outputs
+        expand("bedgraphs/{sample}.bedgraph", sample=sample_list),
+
     output: "multiqc_report.html"
     conda: "rnaseq1"
     resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
@@ -320,6 +323,27 @@ rule find_RNA_edit_sites:
                 -j {params.refSample} \
                 -k {params.wtTimepoint}
         fi 
+    """
+
+#----- Rule to convert RNA Edits to bedgraph
+rule edits2bedgraph:
+    input:
+        a2g = "RNA_Edits/{sample}.a2g.txt"
+    output:
+        bedgraph = "bedgraphs/{sample}.bedgraph"
+    conda: "rnaseq1"
+    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
+    params:
+        sample = lambda wildcards: wildcards.sample,
+        bedgraphScript = config["bedgraphScript"]
+    shell: """
+
+        #----- Run the python script
+        python {params.bedgraphScript} {input.a2g}
+
+        #----- Move python output to new file name
+        mv RNA_Edits/{params.sample}.a2g.txt.bedgraph {output.bedgraph}
+    
     """
 
 
