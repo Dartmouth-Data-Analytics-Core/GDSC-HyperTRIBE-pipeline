@@ -21,6 +21,8 @@ samples_df = pd.read_table(config["sample_csv"], delimiter=",").set_index("Sampl
 sample_list = list(samples_df["Sample_ID"])
 
 
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # SNAKEMAKE RULES
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -67,7 +69,10 @@ rule all:
 
         #----- Rule threshold outputs
         expand("filtered/{sample}.high.threshold.bedgraph", sample=sample_list),
-        expand("filtered/{sample}.low.threshold.bedgraph", sample=sample_list)
+        expand("filtered/{sample}.low.threshold.bedgraph", sample=sample_list),
+
+        #----- Rule summarize results outputs
+        expand("results/{sample}.HyperTRIBE_results.xls", sample=sample_list),
 
     output: "multiqc_report.html"
     conda: "rnaseq1"
@@ -311,23 +316,18 @@ rule find_RNA_edit_sites:
         # -j = reference RNA table name
         # -k = reference RNA timepoint (from sample sheet)
 
-        #----- Check that the current sample is not the reference sample
-        if [ {params.sample} == {params.refSample} ]
-        then 
-            echo "Skipping reference sample {params.sample}"
-            touch RNA_Edits/{params.refSample}.a2g.txt
-        else
-            #----- Run perl script to find RNA edit sites
-            perl {params.findRNA} \
-                -a {params.annotations} \
-                -t {params.sample} \
-                -e {params.sample} \
-                -c {params.timepoint} \
-                -o {output.a2g} \
-                -g {params.refSample} \
-                -j {params.refSample} \
-                -k {params.wtTimepoint}
-        fi 
+              
+        #----- Run perl script to find RNA edit sites
+        perl {params.findRNA} \
+            -a {params.annotations} \
+            -t {params.sample} \
+            -e {params.sample} \
+            -c {params.timepoint} \
+            -o {output.a2g} \
+            -g {params.refSample} \
+            -j {params.refSample} \
+            -k {params.wtTimepoint}
+
     """
 
 #----- Rule to convert RNA Edits to bedgraph
@@ -392,6 +392,24 @@ rule threshold:
             {input.bedgraph} > {output.filteredLow}
     """
 
+#----- Rule to summarize results
+rule summarize_results:
+    input:
+        filteredBed = "filtered/{sample}.high.threshold.bedgraph"
+    output:
+        results = "results/{sample}.HyperTRIBE_results.xls"
+    conda: "perl"
+    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
+    params:
+        sample = lambda wildcards: wildcards.sample,
+        summaryScript = config["summaryScript"]
+    shell: """
+
+        #----- Run the summary script
+        perl {params.summaryScript} \
+            {input.filteredBed} > {output.results}
+    
+    """
 
 
 

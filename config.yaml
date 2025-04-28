@@ -13,6 +13,11 @@ layout: "paired"
 refSample: "DCD"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# REPLICATES
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+#replicateNames: [1,2,3]
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # (NO CONDA) SOFTWARE PATHS
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 trimmomatic_jar: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/misc/shared-software/tools/trimmomatic/Trimmomatic-0.39/trimmomatic-0.39.jar"
@@ -48,3 +53,4 @@ diagnoseDatabase: "CODE/diagnose_mysql_table.pl"
 findRNA: "CODE/find_rnaeditsites.pl"
 bedgraphScript: "CODE/convert_editsites_to_bedgraph.py"
 filterScript: "CODE/filter_by_threshold_without_header.pl"
+summaryScript: "CODE/summarize_results.pl"
