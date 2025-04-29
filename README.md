@@ -1,5 +1,5 @@
 # GDSC-HyperTRIBE-pipeline
-Pipeline for running HyperTRIBE to identify RNA editing sites (In development)
+Pipeline for running HyperTRIBE to identify RNA editing sites 
 
 # Table of Contents
 - [Introduction](#introduction)
