@@ -28,6 +28,7 @@ picard_jar: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/misc/shared-software/tools/picar
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 avgquality: "25"
 starIndex: "/dartfs/rc/nosnapshots/G/GMBSR_refs/Mmusculus/GRCm39/rna_index/STAR_index/GRCm39.primary_assembly.genome"
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # RNA-EDIT SITE PARAMETERS
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
