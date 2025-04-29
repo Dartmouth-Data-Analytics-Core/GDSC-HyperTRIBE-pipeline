@@ -20,6 +20,8 @@ The major steps of this pipeline are as follows:
 2. Load alignments data to MySQL database
 3. Find RNA edit sites wtRNA-RNA approaches
 
+<img src="img/rulegraph.png" alt="Alt text" width="30%"/>
+
 ## Prerequisites
 This pipeline relies on a series of conda environments and a MySQL Instance through [Dartmouth Dashboard](https://dashboard.dartmouth.edu/login?ticket=ST-53352-NHRbCfD1GUAsNsEkc4n9NgHRZYs-localhost). Should this instance fail, a new instance can be created following [these instructions](https://services.dartmouth.edu/TDClient/1806/Portal/KB/ArticleDet?ID=150826). Once an instance is generated, credentials can be obtained in the CLI section on Dartmouth Dashboard. 
 
