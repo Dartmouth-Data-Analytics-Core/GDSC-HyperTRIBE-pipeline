@@ -17,8 +17,8 @@ HyperTRIBE is a technique used for the identification of the targets of RNA bind
 The major steps of this pipeline are as follows:
 
 1. Trim and align sequence libraries to genome
-2. Load alignments data to MySQL database
-3. Find RNA edit sites wtRNA-RNA approaches
+2. Load alignment data to MySQL database
+3. Find RNA A-->G edit sites against wtRNA-RNA sample
 
 <img src="img/rulegraph.png" alt="Alt text" width="30%"/>
 
