@@ -1,5 +1,5 @@
 # GDSC-HyperTRIBE-pipeline
-Pipeline for running HyperTRIBE to identify RNA editing sites (In development)
+Pipeline for running HyperTRIBE to identify RNA editing sites 
 
 # Table of Contents
 - [Introduction](#introduction)
@@ -17,8 +17,10 @@ HyperTRIBE is a technique used for the identification of the targets of RNA bind
 The major steps of this pipeline are as follows:
 
 1. Trim and align sequence libraries to genome
-2. Load alignments data to MySQL database
-3. Find RNA edit sites wtRNA-RNA approaches
+2. Load alignment data to MySQL database
+3. Find RNA A-->G edit sites against wtRNA-RNA sample
+
+<img src="img/rulegraph.png" alt="Alt text" width="30%"/>
 
 ## Prerequisites
 This pipeline relies on a series of conda environments and a MySQL Instance through [Dartmouth Dashboard](https://dashboard.dartmouth.edu/login?ticket=ST-53352-NHRbCfD1GUAsNsEkc4n9NgHRZYs-localhost). Should this instance fail, a new instance can be created following [these instructions](https://services.dartmouth.edu/TDClient/1806/Portal/KB/ArticleDet?ID=150826). Once an instance is generated, credentials can be obtained in the CLI section on Dartmouth Dashboard. 
