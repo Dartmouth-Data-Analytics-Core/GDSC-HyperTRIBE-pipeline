@@ -74,13 +74,6 @@ rule all:
         #----- Rule summarize results outputs
         expand("results/{sample}.HyperTRIBE_results.xls", sample=sample_list),
 
-        #----- Rule to annotate edits
-        expand("results/{sample}.HyperTRIBE_results_temp.csv", sample=sample_list),
-        expand("results/{sample}.HyperTRIBE_results.csv", sample=sample_list),
-        expand("results/{sample}.HyperTRIBE_noIntrons.txt", sample=sample_list),
-        expand("results/{sample}.HyperTRIBE_exonEdits.bed", sample=sample_list),
-        expand("{sample}.hyperTribe_Results_annotated.tsv", sample=sample_list)
-
     output: "multiqc_report.html"
     conda: "rnaseq1"
     resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
@@ -88,6 +81,7 @@ rule all:
         
         #----- Run MultiQC
         multiqc trimming noDups
+        
     """
 
 #----- Rule to execute trimming
@@ -418,67 +412,6 @@ rule summarize_results:
     
     """
 
-#----- Rule to annotate edits
-rule results2csv:
-    input:
-        results = "results/{sample}.HyperTRIBE_results.xls"
-    output:
-        tmp = "results/{sample}.HyperTRIBE_results_temp.csv",
-        csvFile = "results/{sample}.HyperTRIBE_results.csv",
-        noIntrons = "results/{sample}.HyperTRIBE_noIntrons.txt",
-        exonEditsBED = "results/{sample}.HyperTRIBE_exonEdits.bed"
-    conda: "xls2csv"
-    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
-    params:
-    shell: """
-    
-        in2csv {input.results} > {output.tmp}
-
-        # Tidy the data
-        awk -F',' '{{ 
-            n = split($4, a, ";")
-            split($5, b, ";")
-            split($6, c, ";")
-            for (i = 1; i <= n; i++) {{
-                print $1 "," $2 "," $3 "," a[i] "," b[i] "," c[i]
-            }}
-        }}' {output.tmp} > {output.csvFile}
-
-        # Remove intron lines
-        awk -F',' 'NR==1 || $4 != "INTRON"' {output.csvFile} > {output.noIntrons}
-
-        # Get exon edits in bed file format
-        awk -F',' '{{ 
-            split($6, a, "_");
-            chrom = a[1];
-            pos = a[2];
-            if (pos ~ /^[0-9]+$/) {{
-                print chrom, pos-1, pos, $1, $5;
-            }}
-        }}' OFS='\t' {output.noIntrons} > {output.exonEditsBED}
-    """
-
-#----- Next step assumes you already have a CDS_5_3.gtf and bed file
-rule annotate_edits:
-    input:
-        exonEditsBED = "results/{sample}.HyperTRIBE_exonEdits.bed"
-    output: "{sample}.hyperTribe_Results_annotated.tsv"
-    conda: "xls2csv"
-    resources: cpus="10", maxtime="2:00:00", mem_mb="60gb"
-    params:
-        gtfFile = config["gtfFile"],
-        annotateCode = "CODE/Annotate_Edits.sh"
-    shell: """
-    
-        #----- Annotate the edits ($1 = gtf, $2 = exon edits bed file)
-        bash {params.annotateCode} \
-            {params.gtfFile} \
-            {params.annotateCode}
-
-    """
-
-
-    
 
 
 
