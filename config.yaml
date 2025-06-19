@@ -7,7 +7,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # Comma-delimited file with four columns: Sample_ID,fastq_1,fastq_2,replicate (case-sensitive)
 # replicate must be an integer
-sample_csv: "sample_fastq_list_single.txt"
+sample_csv: "samples.csv"
 experimentName: "test"
 layout: "paired"
 refSample: "DCD"
@@ -29,11 +29,16 @@ picard_jar: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/misc/shared-software/tools/picar
 avgquality: "25"
 starIndex: "/dartfs/rc/nosnapshots/G/GMBSR_refs/Mmusculus/GRCm39/rna_index/STAR_index/GRCm39.primary_assembly.genome"
 
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # RNA-EDIT SITE PARAMETERS
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #annotationFile: "annotations/refFlat.txt"
-annotationFile: "/dartfs/rc/nosnapshots/G/GMBSR_refs/Mmusculus/GRCm39/annotation/picard/GRCm39.primary_Assembly.genome.refFlat"
+#annotationFile: /dartfs/rc/nosnapshots/G/GMBSR_refs/Mmusculus/GRCm39/annotation/picard/GRCm39.primary_Assembly.genome.refFlat"
+#annotationFile: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/misc/shared-software/workflows/hypertribe/GDSC-HyperTRIBE-pipeline/mm39.refFlat"
+annotationFile: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/genomic_references/hyperTRIBE_annotations/mm39/mm39.refFlat"
+gtfFile: "/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/genomic_references/hyperTRIBE_annotations/mm39/Mus_musculus.GRCm39.114.gtf"
+#gtfFile: "GTFs/Mus_musculus.GRCm39.114.gtf"
 wtRNA_tableName: "DCD"
 timepoint: "2"
 wtTimepoint: "1"
@@ -44,6 +49,7 @@ wtTimepoint: "1"
 fivePercentEditThreshold: "5"
 onePercentEditThreshold: "1"
 readThreshold: "20"
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # UTILITY SCRIPTS
