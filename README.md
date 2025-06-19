@@ -49,12 +49,31 @@ git clone https://github.com/Dartmouth-Data-Analytics-Core/GDSC-HyperTRIBE
 cd GDSC-HyperTRIBE
 ```
 
+2. Create a `samples.csv` file (comma-separated). This file is 4 columns. An example is below.
+
+``` bash
+Sample_ID,fastq_1,fastq_2,replicate
+DCD,data/211338_02_S14_R1_001.fastq.gz,data/211338_02_S14_R2_001.fastq.gz,DCD
+Mut,data/211338_01_S13_R1_001.fastq.gz,data/211338_01_S13_R2_001.fastq.gz,Mut
+```
+
 2. Ensure all variables in `config.yaml` are edited to point to proper paths
 
 3. Submit Snakemake job script
 
 ```shell
 sbatch job.script.sh
+```
+
+4. Upon completion of Snakemake workflow, run the annotation script on the group of interest using `CODE/hyoerTribe_Annotate.sh`
+This script takes 4 arguments: path to xls results, any file name ending in .txt (for when data gets pivoted), output prefix, and path to annotation gtf. This script will create an `Annotation` directory where final results will live as a .tsv file.
+
+```bash
+bash CODE/hyperTribe_Annotate.sh \
+    results/Mut.HyperTRIBE_results.xls \
+    results/output.txt \
+    MUT \
+    Mus_musculus.GRCm39.114.gtf
 ```
 
 ## Software
