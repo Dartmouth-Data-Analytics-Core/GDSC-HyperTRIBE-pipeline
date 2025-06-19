@@ -147,4 +147,3 @@ awk 'FNR==NR {seen[$4]; next} !($4 in seen)'  ${OUTPUT_DIR}primary_unique_edits.
 awk 'BEGIN{OFS="\t"} {print $1, $3, $4, $5, $6, $7, $8, $9, $11, $13}'  ${OUTPUT_DIR}primary_unique_edits.bed >  ${OUTPUT_DIR}hyperTRIBE_annotated_results.txt
 (echo -e "Chromosome\tEdit_Site\tGene\tScore\tGTF_Chrom\tGTF_Start\tGTF_End\tStrand\tAnnotation" && cat  ${OUTPUT_DIR}hyperTRIBE_annotated_results.txt) >  ${OUTPUT_DIR}hyperTribe_Results_annotated.tsv
 
-
