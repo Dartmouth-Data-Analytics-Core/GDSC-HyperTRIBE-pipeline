@@ -5,6 +5,7 @@ Pipeline for running HyperTRIBE to identify RNA editing sites
 - [Introduction](#introduction)
 - [Pipeline](#pipeline)
 - [Prerequisities](#prerequisites)
+- [MySQL](#mysql)
 - [Implementation](#implementation)
 - [Software](#software)
 - [References](#references)
@@ -35,21 +36,60 @@ The current credentials for the MySQL instance are as follows:
 
 
 
-## Implementation
+## MySQL
 
-To interactively use the MySQL instance, run the following command:
+To interactively use the MySQL instance, run the following command on your **LOCAL** termainl with the credentials above:
 ```{shell}
 mysql -h dmseq-f11b-db.c.dartmouth.edu -u admin -p --ssl-mode=REQUIRED
+
 ```
 
+**CRUCIAL** You need to ensure that mysql is allowing infile loading on both the client and server side. To check this: once inside mysql, run the following:
+
+```mysql
+#-----Check
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+
+#-----If the output of this command returns the follwing, run the next line:
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| local_infile  | OFF   |
++---------------+-------+
+
+#---- Run this is `local_infile` is off
+SET GLOBAL local_infile = 1;
+
+#---- Check again
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| local_infile  | ON    |
++---------------+-------+
+```
+
+Also ensure within your code folder, you have the `mysql.cnf` file with the following contents:
+
+```shell
+[client]
+local_infile = 1
+ssl-mode=REQUIRED
+
+[mysqld]
+local_infile = 1
+```
+
+## Implementation 
 1. Clone the github repository
+   
+2. HyperTRIBE annotations can be found at the following path on Discovery `/dartfs-hpc/rc/lab/G/GMBSR_bioinfo/genomic_references/hyperTRIBE_annotations/mm39`. You can either symlink this path to your working directory and point to it in the `config.yaml`, or point directly to the source. 
 
 ```shell
 git clone https://github.com/Dartmouth-Data-Analytics-Core/GDSC-HyperTRIBE
 cd GDSC-HyperTRIBE
 ```
 
-2. Create a `samples.csv` file (comma-separated). This file is 4 columns. An example is below.
+3. Create a `samples.csv` file (comma-separated). This file is 4 columns. An example is below.
 
 ``` bash
 Sample_ID,fastq_1,fastq_2,replicate
@@ -57,15 +97,15 @@ DCD,data/211338_02_S14_R1_001.fastq.gz,data/211338_02_S14_R2_001.fastq.gz,DCD
 Mut,data/211338_01_S13_R1_001.fastq.gz,data/211338_01_S13_R2_001.fastq.gz,Mut
 ```
 
-2. Ensure all variables in `config.yaml` are edited to point to proper paths
+4. Ensure all variables in `config.yaml` are edited to point to proper paths
 
-3. Submit Snakemake job script
+5. Submit Snakemake job script
 
 ```shell
 sbatch job.script.sh
 ```
 
-4. Upon completion of Snakemake workflow, run the annotation script on the group of interest using `CODE/hyoerTribe_Annotate.sh`
+6. Upon completion of Snakemake workflow, run the annotation script on the group of interest using `CODE/hyoerTribe_Annotate.sh`
 This script takes 4 arguments: path to xls results, any file name ending in .txt (for when data gets pivoted), output prefix, and path to annotation gtf. This script will create an `Annotation` directory where final results will live as a .tsv file.
 
 ```bash
