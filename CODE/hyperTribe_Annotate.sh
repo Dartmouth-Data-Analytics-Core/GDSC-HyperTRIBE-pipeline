@@ -88,7 +88,7 @@ awk 'BEGIN{OFS="\t"}
 }' "$GTFFILE" > ${UTIL_DIR}fullGTF.bed
 
 
-bedtools intersect -a "${OUTPUT_DIR}""${PREFIX}".exonEdits.bed -b CDS_5_3.bed -wa -wb | \
+bedtools intersect -a "${OUTPUT_DIR}""${PREFIX}".exonEdits.bed -b ${UTIL_DIR}CDS_5_3.bed -wa -wb | \
 awk 'BEGIN{OFS="\t"} {
     if ($4 == $9) {
         query = $1 FS $2 FS $3 FS $4;
