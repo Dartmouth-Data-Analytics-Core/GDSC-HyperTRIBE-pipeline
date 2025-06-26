@@ -37,17 +37,19 @@ my $password = "gdscPass";
 my $dsn = "DBI:mysql:$database:$host:3306;mysql_local_infile=1";
 #my $dbh = DBI->connect($dsn, $user, $password, { RaiseError => 1 }) or die $DBI::errstr;
 
+# Changed this from original to add th emysql_local_infile argument
 my $dbh = DBI->connect($dsn, $user, $password, { 
     RaiseError => 1, 
     mysql_read_default_file => '/CODE/mysql.cnf',
-    mysql_ssl => 1,  
+    mysql_ssl => 1,
+    mysql_local_infile => 1
 }) or die $DBI::errstr;
 
 
-# Drop the table if it already exists
-#eval {
-#    $dbh->do("DROP TABLE IF EXISTS $tablename");
-#};
+# Drop the table if it already exists (unhased this)
+eval {
+    $dbh->do("DROP TABLE IF EXISTS $tablename");
+};
 
 my ($sth);
 #create the table
