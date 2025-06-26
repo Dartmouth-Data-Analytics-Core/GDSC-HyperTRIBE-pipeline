@@ -81,7 +81,6 @@ rule all:
         
         #----- Run MultiQC
         multiqc trimming noDups
-        
     """
 
 #----- Rule to execute trimming
@@ -323,11 +322,11 @@ rule find_RNA_edit_sites:
             -a {params.annotations} \
             -t {params.sample} \
             -e {params.sample} \
-            -c {params.timepoint} \
+            -c {params.sample} \
             -o {output.a2g} \
             -g {params.refSample} \
             -j {params.refSample} \
-            -k {params.wtTimepoint}
+            -k {params.refSample}
 
     """
 
@@ -412,6 +411,9 @@ rule summarize_results:
     
     """
 
+
+
+    
 
 
 
